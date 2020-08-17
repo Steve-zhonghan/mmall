@@ -10,7 +10,11 @@ import com.mmall.utility.MD5Util;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -186,5 +190,25 @@ public class userServiceImpl implements IUserService {
         }else{
             return serverResponse.createByError();
         }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED , readOnly = false)
+    @Override
+    public void transaction(){
+        User user1 = new User();
+        user1.setId(40);
+        user1.setUsername("zhanghan2");
+        user1.setPassword("111");
+        user1.setAnswer("daan");
+        user1.setEmail("zhang@18.com");
+        user1.setPhone("11111");
+        user1.setQuestion("question");
+        user1.setRole(1);
+        int result = userMapper.insert(user1);
+
+        //User user  = userMapper.selectLogin("steve","D69403E2673E611D4CBD3FAD6FD1788E");
+        //System.out.println(user.getUsername());
+        throw new RuntimeException();
+
     }
 }

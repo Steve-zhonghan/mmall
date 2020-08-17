@@ -3,16 +3,25 @@ package com.mmall.controller.portal;
 import com.mmall.common.Consts;
 import com.mmall.common.responseCode;
 import com.mmall.common.serverResponse;
+import com.mmall.dao.UserMapper;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
+import com.mmall.utility.CookieUtil;
+import com.mmall.utility.RedisPoolUtil;
+import com.mmall.utility.jsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Controller
@@ -21,19 +30,26 @@ public class userController {
 
     @Autowired
     private IUserService iUserService;
+
+    @Autowired
+    private UserMapper userMapper;
     /**
-     * The function for user to login in
+     * The function for user to login
      * @param username
      * @param password
      * @param session
      * @return
      */
-    @RequestMapping(value="login.do",method= RequestMethod.POST)
+    @RequestMapping(value="login.do",method= RequestMethod.GET)
     @ResponseBody
-    public serverResponse<User> login(String username, String password, HttpSession session){
+    public serverResponse<User> login(String username, String password, HttpSession session, HttpServletResponse httpServletResponse, HttpServletRequest request){
         serverResponse<User> response = iUserService.login(username,password);
         if(response.isSuccess()){
-            session.setAttribute(Consts.CURRENT_USER,response.getData());
+//            session.setAttribute(Consts.CURRENT_USER,response.getData());
+            CookieUtil.writeLoginToken(httpServletResponse,session.getId());
+            CookieUtil.readLoginToken(request);
+            CookieUtil.delLoginToken(request,httpServletResponse);
+            RedisPoolUtil.setEx(session.getId(), jsonUtil.obj2String(response.getData()), Consts.RedisCartCacheExTime.REDIS_SESSION_EXTIME);
         }
         return response;
     }
@@ -122,4 +138,12 @@ public class userController {
         }
         return iUserService.getInformation(currentUser.getId());
     }
+
+    @RequestMapping(value="transaction.do",method= RequestMethod.GET)
+    @ResponseBody
+    public serverResponse<User> transaction(HttpSession session){
+        iUserService.transaction();
+        return serverResponse.createBySuccess();
+    }
+
 }

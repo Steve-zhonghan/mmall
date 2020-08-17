@@ -6,6 +6,7 @@ import com.mmall.common.serverResponse;
 import com.mmall.dao.CategoryMapper;
 import com.mmall.pojo.Category;
 import com.mmall.service.ICategoryService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service("iCategoryService")
+@Slf4j
 public class categoryServiceImpl implements ICategoryService {
 
     @Autowired
@@ -61,7 +63,7 @@ public class categoryServiceImpl implements ICategoryService {
     public serverResponse<List<Category>> getChildrenParallelCategory(Integer categoryId){
         List<Category> categoryList = categoryMapper.selectCategoryChildrenByParentId(categoryId);
         if(CollectionUtils.isEmpty(categoryList)){
-            logger.info("Failed to find the sublist of current list");
+            log.info("Failed to find the sublist of current list");
         }
         return serverResponse.createBySuccess(categoryList);
     }
