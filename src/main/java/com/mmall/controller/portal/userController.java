@@ -57,6 +57,9 @@ public class userController {
     @ResponseBody
     public serverResponse<User> logout(HttpServletRequest request,HttpServletResponse response){
         String loginToken = CookieUtil.readLoginToken(request);
+        if(StringUtils.isEmpty(loginToken)){
+            return serverResponse.createByErrorMessage("You need to login");
+        }
         CookieUtil.delLoginToken(request,response);
         RedisPoolUtil.del(loginToken);
 //        session.removeAttribute(Consts.CURRENT_USER);
@@ -82,7 +85,7 @@ public class userController {
 //        User user = (User)session.getAttribute(Consts.CURRENT_USER);
         String loginToken = CookieUtil.readLoginToken(request);
         if(StringUtils.isEmpty(loginToken)){
-            return serverResponse.createByErrorMessage("Failed to get current user information");
+            return serverResponse.createByErrorMessage("You need to login");
         }
         String userJsonStr = RedisPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
