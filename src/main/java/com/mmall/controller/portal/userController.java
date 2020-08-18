@@ -24,6 +24,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Controller
 @RequestMapping("/user/")
@@ -46,7 +47,7 @@ public class userController {
     public serverResponse<User> login(String username, String password, HttpSession session, HttpServletResponse httpServletResponse){
         serverResponse<User> response = iUserService.login(username,password);
         if(response.isSuccess()){
-//            session.setAttribute(Consts.CURRENT_USER,response.getData());
+//            User user = （User）session.setAttribute(Consts.CURRENT_USER,response.getData());
             CookieUtil.writeLoginToken(httpServletResponse,session.getId());
             RedisPoolUtil.setEx(session.getId(), jsonUtil.obj2String(response.getData()), Consts.RedisCartCacheExTime.REDIS_SESSION_EXTIME);
         }
@@ -117,8 +118,14 @@ public class userController {
 
     @RequestMapping(value="reset_password.do",method= RequestMethod.POST)
     @ResponseBody
-    public serverResponse<String> resetPassword(HttpSession session,String old_password,String new_password){
-        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+    public serverResponse<String> resetPassword(HttpServletRequest request,String old_password,String new_password){
+//        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);
+        if(StringUtils.isEmpty(loginToken)){
+            return serverResponse.createByErrorMessage("You need to login");
+        }
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user==null){
             return serverResponse.createByErrorMessage("The user does not signed in");
         }
@@ -127,8 +134,14 @@ public class userController {
 
     @RequestMapping(value="update_information.do",method= RequestMethod.POST)
     @ResponseBody
-    public serverResponse<User> update_information(HttpSession session,User user){
-        User currentUser = (User)session.getAttribute(Consts.CURRENT_USER);
+    public serverResponse<User> update_information(HttpServletRequest request,User user){
+//        User currentUser = (User)session.getAttribute(Consts.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);
+        if(StringUtils.isEmpty(loginToken)){
+            return serverResponse.createByErrorMessage("You need to login");
+        }
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        User currentUser = jsonUtil.string2Obj(userJsonStr,User.class);
         if(currentUser==null){
             return serverResponse.createByErrorMessage("The user does not signed in");
         }
@@ -136,15 +149,22 @@ public class userController {
         user.setUsername(currentUser.getUsername());
         serverResponse response = iUserService.updateInformation(user);
         if(response.isSuccess()){
-            session.setAttribute(Consts.CURRENT_USER,response.getData());
+//            session.setAttribute(Consts.CURRENT_USER,response.getData());
+            RedisPoolUtil.setEx(loginToken, jsonUtil.obj2String(response.getData()), Consts.RedisCartCacheExTime.REDIS_SESSION_EXTIME);
         }
         return response;
     }
 
     @RequestMapping(value="get_information.do",method= RequestMethod.POST)
     @ResponseBody
-    public serverResponse<User> get_information(HttpSession session){
-        User currentUser = (User)session.getAttribute(Consts.CURRENT_USER);
+    public serverResponse<User> get_information(HttpServletRequest request){
+//        User currentUser = (User)session.getAttribute(Consts.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);
+        if(StringUtils.isEmpty(loginToken)){
+            return serverResponse.createByErrorMessage("You need to login");
+        }
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        User currentUser = jsonUtil.string2Obj(userJsonStr,User.class);
         if(currentUser==null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),"You need to login in，code=10");
         }

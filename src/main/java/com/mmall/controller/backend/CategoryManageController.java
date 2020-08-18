@@ -7,12 +7,17 @@ import com.mmall.pojo.Category;
 import com.mmall.pojo.User;
 import com.mmall.service.ICategoryService;
 import com.mmall.service.IUserService;
+import com.mmall.utility.CookieUtil;
+import com.mmall.utility.RedisPoolUtil;
+import com.mmall.utility.jsonUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 
@@ -28,8 +33,14 @@ public class CategoryManageController {
 
     @RequestMapping("add_category.do")
     @ResponseBody
-    public serverResponse addCategory(HttpSession session,String categoryName,@RequestParam(value="parentId",defaultValue = "0") int parentId){
-        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+    public serverResponse addCategory(HttpServletRequest request, String categoryName, @RequestParam(value="parentId",defaultValue = "0") int parentId){
+//        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);
+        if(StringUtils.isEmpty(loginToken)){
+            return serverResponse.createByErrorMessage("You need to login");
+        }
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user==null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),"User need to log in");
         }
@@ -45,8 +56,14 @@ public class CategoryManageController {
 
     @RequestMapping("set_category_name.do")
     @ResponseBody
-    public serverResponse setCategoryName(HttpSession session,Integer categoryId,String categoryName){
-        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+    public serverResponse setCategoryName(HttpServletRequest request,Integer categoryId,String categoryName){
+//        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);
+        if(StringUtils.isEmpty(loginToken)){
+            return serverResponse.createByErrorMessage("You need to login");
+        }
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user==null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),"User need to log in");
         }
@@ -62,8 +79,14 @@ public class CategoryManageController {
     @RequestMapping("get_category.do")
     @ResponseBody
     //无递归
-    public serverResponse getChildrenParallelCategory(HttpSession session, @RequestParam(value = "categoryId",defaultValue ="0")Integer categoryId){
-        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+    public serverResponse getChildrenParallelCategory(HttpServletRequest request, @RequestParam(value = "categoryId",defaultValue ="0")Integer categoryId){
+//        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);
+        if(StringUtils.isEmpty(loginToken)){
+            return serverResponse.createByErrorMessage("You need to login");
+        }
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user==null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),"User need to log in");
         }
@@ -78,8 +101,14 @@ public class CategoryManageController {
     @RequestMapping("get_deep_category.do")
     @ResponseBody
     //无递归
-    public serverResponse getCategoryAndDeepChildrenCategory(HttpSession session, @RequestParam(value = "categoryId",defaultValue ="0")Integer categoryId){
-        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+    public serverResponse getCategoryAndDeepChildrenCategory(HttpServletRequest request, @RequestParam(value = "categoryId",defaultValue ="0")Integer categoryId){
+//        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);
+        if(StringUtils.isEmpty(loginToken)){
+            return serverResponse.createByErrorMessage("You need to login");
+        }
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user==null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),"User need to log in");
         }

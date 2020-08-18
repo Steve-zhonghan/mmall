@@ -2,16 +2,13 @@ package com.mmall.service.Impl;
 
 import com.mmall.common.Consts;
 import com.mmall.common.serverResponse;
-import com.mmall.common.tokenCache;
 import com.mmall.dao.UserMapper;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
 import com.mmall.utility.MD5Util;
-import org.apache.commons.codec.digest.Md5Crypt;
+import com.mmall.utility.RedisPoolUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,7 +99,8 @@ public class userServiceImpl implements IUserService {
         if(resultCount>0){
             //说明答案正确，生成token
             String forgetToken = UUID.randomUUID().toString();
-            tokenCache.setKey(tokenCache.TOKEN_PREFIX+username,forgetToken);
+//            tokenCache.setKey(tokenCache.TOKEN_PREFIX+username,forgetToken);
+            RedisPoolUtil.setEx(Consts.TOKEN_PREFIX+username,forgetToken,60*60*12);
             return serverResponse.createBySuccess(forgetToken);
         }
         return serverResponse.createByErrorMessage("Wrong answer");
@@ -117,7 +115,8 @@ public class userServiceImpl implements IUserService {
         if(validResponse.isSuccess()){
             return serverResponse.createByErrorMessage("Non-existed user");
         }
-        String token  = tokenCache.getKey(tokenCache.TOKEN_PREFIX+username);
+//        String token  = tokenCache.getKey(tokenCache.TOKEN_PREFIX+username);
+        String token = RedisPoolUtil.get(Consts.TOKEN_PREFIX+username);
         if(StringUtils.isBlank(token)){
             return serverResponse.createByErrorMessage("token is not valid or expired");
         }

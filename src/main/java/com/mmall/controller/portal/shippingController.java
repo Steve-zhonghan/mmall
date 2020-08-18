@@ -7,12 +7,17 @@ import com.mmall.common.serverResponse;
 import com.mmall.pojo.Shipping;
 import com.mmall.pojo.User;
 import com.mmall.service.IShippingService;
+import com.mmall.utility.CookieUtil;
+import com.mmall.utility.RedisPoolUtil;
+import com.mmall.utility.jsonUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Controller
@@ -25,8 +30,14 @@ public class shippingController {
     //springMVC数据对象绑定 Shipping绑定
     @RequestMapping("add.do")
     @ResponseBody
-    public serverResponse add(HttpSession session, Shipping shipping){
-        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+    public serverResponse add(HttpServletRequest request, Shipping shipping){
+//        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);
+        if(StringUtils.isEmpty(loginToken)){
+            return serverResponse.createByErrorMessage("You need to login");
+        }
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user == null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());
         }
@@ -35,8 +46,14 @@ public class shippingController {
 
     @RequestMapping("del.do")
     @ResponseBody
-    public serverResponse del(HttpSession session, Integer shippingId){
-        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+    public serverResponse del(HttpServletRequest request, Integer shippingId){
+//        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);
+        if(StringUtils.isEmpty(loginToken)){
+            return serverResponse.createByErrorMessage("You need to login");
+        }
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user == null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());
         }
@@ -45,8 +62,14 @@ public class shippingController {
 
     @RequestMapping("update.do")
     @ResponseBody
-    public serverResponse update(HttpSession session, Shipping shipping){
-        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+    public serverResponse update(HttpServletRequest request, Shipping shipping){
+//        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);
+        if(StringUtils.isEmpty(loginToken)){
+            return serverResponse.createByErrorMessage("You need to login");
+        }
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user == null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());
         }
@@ -55,8 +78,14 @@ public class shippingController {
 
     @RequestMapping("select.do")
     @ResponseBody
-    public serverResponse<Shipping> select(HttpSession session, Integer shippingId){
-        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+    public serverResponse<Shipping> select(HttpServletRequest request, Integer shippingId){
+//        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);
+        if(StringUtils.isEmpty(loginToken)){
+            return serverResponse.createByErrorMessage("You need to login");
+        }
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user == null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());
         }
@@ -67,8 +96,14 @@ public class shippingController {
     @ResponseBody
     public serverResponse<PageInfo> list(@RequestParam(value = "pageNum", defaultValue = "1")int pageNum,
                                          @RequestParam(value = "pageSize", defaultValue = "10")int pageSize,
-                                         HttpSession session){
-        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+                                         HttpServletRequest request){
+//        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);
+        if(StringUtils.isEmpty(loginToken)){
+            return serverResponse.createByErrorMessage("You need to login");
+        }
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user == null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());
         }
