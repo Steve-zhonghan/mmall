@@ -1,6 +1,7 @@
 package com.mmall.controller.portal;
 
 import com.mmall.common.Consts;
+import com.mmall.common.RedisPool;
 import com.mmall.common.responseCode;
 import com.mmall.common.serverResponse;
 import com.mmall.dao.UserMapper;
@@ -42,7 +43,7 @@ public class userController {
      */
     @RequestMapping(value="login.do",method= RequestMethod.POST)
     @ResponseBody
-    public serverResponse<User> login(String username, String password, HttpSession session, HttpServletResponse httpServletResponse, HttpServletRequest request){
+    public serverResponse<User> login(String username, String password, HttpSession session, HttpServletResponse httpServletResponse){
         serverResponse<User> response = iUserService.login(username,password);
         if(response.isSuccess()){
 //            session.setAttribute(Consts.CURRENT_USER,response.getData());
@@ -54,8 +55,11 @@ public class userController {
 
     @RequestMapping(value="logout.do",method= RequestMethod.POST)
     @ResponseBody
-    public serverResponse<User> logout(HttpSession session){
-        session.removeAttribute(Consts.CURRENT_USER);
+    public serverResponse<User> logout(HttpServletRequest request,HttpServletResponse response){
+        String loginToken = CookieUtil.readLoginToken(request);
+        CookieUtil.delLoginToken(request,response);
+        RedisPoolUtil.del(loginToken);
+//        session.removeAttribute(Consts.CURRENT_USER);
         return serverResponse.createBySuccess();
     }
 
@@ -74,8 +78,15 @@ public class userController {
 
     @RequestMapping(value="get_user_info.do",method= RequestMethod.POST)
     @ResponseBody
-    public serverResponse<User> getUserInfo(HttpSession session){
-        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+    public serverResponse<User> getUserInfo(HttpServletRequest request){
+//        User user = (User)session.getAttribute(Consts.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);
+        if(StringUtils.isEmpty(loginToken)){
+            return serverResponse.createByErrorMessage("Failed to get current user information");
+        }
+        String userJsonStr = RedisPoolUtil.get(loginToken);
+        User user = jsonUtil.string2Obj(userJsonStr,User.class);
+
         if(user!=null){
             return serverResponse.createBySuccess(user);
         }

@@ -26,11 +26,17 @@ public class CookieUtil {
         return null;
     }
 
+    //X::domain="www.eye.com" a,b,c,d,e都能看到cookie
+    //a:A.eye.com 二级域名，a b互相拿不到cookie                         cookie:domain=A.eye.com;path="/"
+    //b:B.eye.com 二级域名  a b互相拿不到cookie                         cookie:domain=B.eye.com;path="/"
+    //c:A.eye.com/test/cc   能拿到a，e的cookie   不能拿到b，d的cookie    cookie:domain=A.eye.com;path="/test/cc"
+    //d:A.eye.com/test/dd   能拿到a，e的cookie   不能拿到b，d的cookie    cookie:domain=A.eye.com;path="/test/dd"
+    //e:A.eye.com/test                                               cookie:domain=A.eye.com;path="/test"
     public static void writeLoginToken(HttpServletResponse response,String token){
         Cookie ck = new Cookie(COOKIE_NAME,token);
         ck.setDomain(COOKIE_DOMAIN);
         ck.setPath("/");//代表设置在根目录下
-
+        ck.setHttpOnly(true);//排除用脚本获取cookie信息
         //单位是秒
         //如果这个maxage不设置的话，cookie就不会写入硬盘，而是写入内存。只在当前页面有效
         ck.setMaxAge(60 * 60 *24 *365);//如果是-1，代表永久
