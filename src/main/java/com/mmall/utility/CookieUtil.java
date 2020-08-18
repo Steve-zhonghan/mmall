@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
 public class CookieUtil {
-    private static final String COOKIE_DOMAIN = "";//一级域名
+    private static final String COOKIE_DOMAIN = "www.eye.com";//一级域名
     private static final String COOKIE_NAME = "mmall_login_token";
 
     public static String readLoginToken(HttpServletRequest request){
@@ -28,7 +28,7 @@ public class CookieUtil {
 
     public static void writeLoginToken(HttpServletResponse response,String token){
         Cookie ck = new Cookie(COOKIE_NAME,token);
-        ck.setDomain(COOKIE_NAME);
+        ck.setDomain(COOKIE_DOMAIN);
         ck.setPath("/");//代表设置在根目录下
 
         //单位是秒
@@ -36,7 +36,6 @@ public class CookieUtil {
         ck.setMaxAge(60 * 60 *24 *365);//如果是-1，代表永久
         log.info("write cookieName:{},cookieValue:{}",ck.getName(),ck.getValue());
         response.addCookie(ck);
-
     }
 
     public static void delLoginToken(HttpServletRequest request,HttpServletResponse response){
