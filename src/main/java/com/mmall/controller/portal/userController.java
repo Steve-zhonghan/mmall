@@ -9,6 +9,7 @@ import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
 import com.mmall.utility.CookieUtil;
 import com.mmall.utility.RedisPoolUtil;
+import com.mmall.utility.RedisShardedPoolUntil;
 import com.mmall.utility.jsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class userController {
         if(response.isSuccess()){
 //            User user = （User）session.setAttribute(Consts.CURRENT_USER,response.getData());
             CookieUtil.writeLoginToken(httpServletResponse,session.getId());
-            RedisPoolUtil.setEx(session.getId(), jsonUtil.obj2String(response.getData()), Consts.RedisCartCacheExTime.REDIS_SESSION_EXTIME);
+            RedisShardedPoolUntil.setEx(session.getId(), jsonUtil.obj2String(response.getData()), Consts.RedisCartCacheExTime.REDIS_SESSION_EXTIME);
         }
         return response;
     }
@@ -62,7 +63,7 @@ public class userController {
             return serverResponse.createByErrorMessage("You need to login");
         }
         CookieUtil.delLoginToken(request,response);
-        RedisPoolUtil.del(loginToken);
+        RedisShardedPoolUntil.del(loginToken);
 //        session.removeAttribute(Consts.CURRENT_USER);
         return serverResponse.createBySuccess();
     }
@@ -88,7 +89,7 @@ public class userController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
 
         if(user!=null){
@@ -105,7 +106,7 @@ public class userController {
 
     @RequestMapping(value="forget_check_answer.do",method= RequestMethod.POST)
     @ResponseBody
-    //token,本地guava缓存做token
+    //一期token,本地guava缓存做token，二期token存在redis
     public serverResponse<String> forgetCheckAnswer(String username,String question,String answer){
         return iUserService.checkAnswer(username,question,answer);
     }
@@ -124,7 +125,7 @@ public class userController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user==null){
             return serverResponse.createByErrorMessage("The user does not signed in");
@@ -140,7 +141,7 @@ public class userController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
         User currentUser = jsonUtil.string2Obj(userJsonStr,User.class);
         if(currentUser==null){
             return serverResponse.createByErrorMessage("The user does not signed in");
@@ -150,7 +151,7 @@ public class userController {
         serverResponse response = iUserService.updateInformation(user);
         if(response.isSuccess()){
 //            session.setAttribute(Consts.CURRENT_USER,response.getData());
-            RedisPoolUtil.setEx(loginToken, jsonUtil.obj2String(response.getData()), Consts.RedisCartCacheExTime.REDIS_SESSION_EXTIME);
+            RedisShardedPoolUntil.setEx(loginToken, jsonUtil.obj2String(response.getData()), Consts.RedisCartCacheExTime.REDIS_SESSION_EXTIME);
         }
         return response;
     }
@@ -163,7 +164,7 @@ public class userController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
         User currentUser = jsonUtil.string2Obj(userJsonStr,User.class);
         if(currentUser==null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),"You need to login in，code=10");

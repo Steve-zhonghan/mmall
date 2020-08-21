@@ -7,6 +7,7 @@ import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
 import com.mmall.utility.MD5Util;
 import com.mmall.utility.RedisPoolUtil;
+import com.mmall.utility.RedisShardedPoolUntil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -100,7 +101,7 @@ public class userServiceImpl implements IUserService {
             //说明答案正确，生成token
             String forgetToken = UUID.randomUUID().toString();
 //            tokenCache.setKey(tokenCache.TOKEN_PREFIX+username,forgetToken);
-            RedisPoolUtil.setEx(Consts.TOKEN_PREFIX+username,forgetToken,60*60*12);
+            RedisShardedPoolUntil.setEx(Consts.TOKEN_PREFIX+username,forgetToken,60*60*12);
             return serverResponse.createBySuccess(forgetToken);
         }
         return serverResponse.createByErrorMessage("Wrong answer");
@@ -116,7 +117,7 @@ public class userServiceImpl implements IUserService {
             return serverResponse.createByErrorMessage("Non-existed user");
         }
 //        String token  = tokenCache.getKey(tokenCache.TOKEN_PREFIX+username);
-        String token = RedisPoolUtil.get(Consts.TOKEN_PREFIX+username);
+        String token = RedisShardedPoolUntil.get(Consts.TOKEN_PREFIX+username);
         if(StringUtils.isBlank(token)){
             return serverResponse.createByErrorMessage("token is not valid or expired");
         }
