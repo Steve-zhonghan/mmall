@@ -10,7 +10,7 @@ import redis.clients.jedis.ShardedJedis;
  * RedisShardedPool api封装
  */
 @Slf4j
-public class RedisShardedPoolUntil {
+public class RedisShardedPoolUtil {
 
     public static String set(String key, String value){
         ShardedJedis jedis = null;

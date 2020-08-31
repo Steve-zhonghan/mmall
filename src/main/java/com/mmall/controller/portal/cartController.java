@@ -6,8 +6,7 @@ import com.mmall.common.serverResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.ICartService;
 import com.mmall.utility.CookieUtil;
-import com.mmall.utility.RedisPoolUtil;
-import com.mmall.utility.RedisShardedPoolUntil;
+import com.mmall.utility.RedisShardedPoolUtil;
 import com.mmall.utility.jsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/cart/")
@@ -33,7 +31,7 @@ public class cartController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user == null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());
@@ -49,7 +47,7 @@ public class cartController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user == null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());
@@ -65,7 +63,7 @@ public class cartController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user == null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());
@@ -81,7 +79,7 @@ public class cartController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user == null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());
@@ -98,7 +96,7 @@ public class cartController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if (user == null) {
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(), responseCode.NEED_LOGIN.getDesc());
@@ -115,7 +113,7 @@ public class cartController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if (user == null) {
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(), responseCode.NEED_LOGIN.getDesc());
@@ -132,7 +130,7 @@ public class cartController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if (user == null) {
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(), responseCode.NEED_LOGIN.getDesc());
@@ -149,7 +147,7 @@ public class cartController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if (user == null) {
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(), responseCode.NEED_LOGIN.getDesc());
@@ -166,7 +164,7 @@ public class cartController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if (user == null) {
             return serverResponse.createBySuccess(0);

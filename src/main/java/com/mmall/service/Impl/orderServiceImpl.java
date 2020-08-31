@@ -27,8 +27,10 @@ import com.mmall.vo.OrderItemVo;
 import com.mmall.vo.OrderProductVo;
 import com.mmall.vo.OrderVo;
 import com.mmall.vo.ShippingVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Service("iOrderService")
+@Slf4j
 public class orderServiceImpl implements IOrderService {
 
     private static final Logger logger = LoggerFactory.getLogger(orderServiceImpl.class);
@@ -537,6 +540,29 @@ public class orderServiceImpl implements IOrderService {
             }
         }
         return serverResponse.createByErrorMessage("This order does not exist");
+    }
+
+    @Override
+    public void closeOrder(int hour){
+
+        Date closeDateTime  = DateUtils.addHours(new Date(),-hour);
+        List<Order> orderList = orderMapper.selectOrderStatusByCreateTime(Consts.OrderStatusEnum.NO_PAY.getCode(),DateTimeUtil.dateToStr(closeDateTime));
+        for(Order order:orderList){
+            List<OrderItem> orderItemList = orderItemMapper.getByOrderNo(order.getOrderNo());
+            for(OrderItem orderItem:orderItemList){
+                //一定用主键where条件，防止表锁。同时必须是InnoDB
+                Integer stock = productMapper.selectStockByProductID(orderItem.getProductId());
+                //如果已生成订单里的商品，被删除的情况
+                if(stock==null) continue;
+                Product product = new Product();
+                product.setId(orderItem.getProductId());
+                product.setStock(stock+orderItem.getQuantity());
+                productMapper.updateByPrimaryKeySelective(product);
+            }
+            orderMapper.closeOrderByOrderId(order.getId());
+            log.info("关闭订单OrderNo:{}",order.getOrderNo());
+        }
+
     }
 
 }

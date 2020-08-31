@@ -3,7 +3,6 @@ package com.mmall.controller.portal;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.demo.trade.config.Configs;
-import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.mmall.common.Consts;
 import com.mmall.common.responseCode;
@@ -11,8 +10,7 @@ import com.mmall.common.serverResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.IOrderService;
 import com.mmall.utility.CookieUtil;
-import com.mmall.utility.RedisPoolUtil;
-import com.mmall.utility.RedisShardedPoolUntil;
+import com.mmall.utility.RedisShardedPoolUtil;
 import com.mmall.utility.jsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -24,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -45,7 +42,7 @@ public class orderController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user ==null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());
@@ -61,7 +58,7 @@ public class orderController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user ==null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());
@@ -77,7 +74,7 @@ public class orderController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user ==null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());
@@ -95,7 +92,7 @@ public class orderController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user ==null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());
@@ -147,7 +144,7 @@ public class orderController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user ==null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());
@@ -167,7 +164,7 @@ public class orderController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user ==null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());
@@ -184,7 +181,7 @@ public class orderController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user ==null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),responseCode.NEED_LOGIN.getDesc());

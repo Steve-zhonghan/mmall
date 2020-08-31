@@ -22,4 +22,7 @@ public interface IOrderService {
     serverResponse<OrderVo> manageDetail(Long orderNo);
     serverResponse<PageInfo> manageSearch(Long orderNo,int pageNum,int pageSize);
     serverResponse<String> manageSendGoods(Long orderNo);
+
+    //hour个小时未付款的订单，进行关闭
+    void closeOrder(int hour);
 }

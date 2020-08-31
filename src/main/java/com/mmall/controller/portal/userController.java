@@ -1,31 +1,24 @@
 package com.mmall.controller.portal;
 
 import com.mmall.common.Consts;
-import com.mmall.common.RedisPool;
 import com.mmall.common.responseCode;
 import com.mmall.common.serverResponse;
 import com.mmall.dao.UserMapper;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
 import com.mmall.utility.CookieUtil;
-import com.mmall.utility.RedisPoolUtil;
-import com.mmall.utility.RedisShardedPoolUntil;
+import com.mmall.utility.RedisShardedPoolUtil;
 import com.mmall.utility.jsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Controller
 @RequestMapping("/user/")
@@ -50,7 +43,7 @@ public class userController {
         if(response.isSuccess()){
 //            User user = （User）session.setAttribute(Consts.CURRENT_USER,response.getData());
             CookieUtil.writeLoginToken(httpServletResponse,session.getId());
-            RedisShardedPoolUntil.setEx(session.getId(), jsonUtil.obj2String(response.getData()), Consts.RedisCartCacheExTime.REDIS_SESSION_EXTIME);
+            RedisShardedPoolUtil.setEx(session.getId(), jsonUtil.obj2String(response.getData()), Consts.RedisCartCacheExTime.REDIS_SESSION_EX_TIME);
         }
         return response;
     }
@@ -63,7 +56,7 @@ public class userController {
             return serverResponse.createByErrorMessage("You need to login");
         }
         CookieUtil.delLoginToken(request,response);
-        RedisShardedPoolUntil.del(loginToken);
+        RedisShardedPoolUtil.del(loginToken);
 //        session.removeAttribute(Consts.CURRENT_USER);
         return serverResponse.createBySuccess();
     }
@@ -89,7 +82,7 @@ public class userController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
 
         if(user!=null){
@@ -125,7 +118,7 @@ public class userController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = jsonUtil.string2Obj(userJsonStr,User.class);
         if(user==null){
             return serverResponse.createByErrorMessage("The user does not signed in");
@@ -141,7 +134,7 @@ public class userController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User currentUser = jsonUtil.string2Obj(userJsonStr,User.class);
         if(currentUser==null){
             return serverResponse.createByErrorMessage("The user does not signed in");
@@ -151,7 +144,7 @@ public class userController {
         serverResponse response = iUserService.updateInformation(user);
         if(response.isSuccess()){
 //            session.setAttribute(Consts.CURRENT_USER,response.getData());
-            RedisShardedPoolUntil.setEx(loginToken, jsonUtil.obj2String(response.getData()), Consts.RedisCartCacheExTime.REDIS_SESSION_EXTIME);
+            RedisShardedPoolUtil.setEx(loginToken, jsonUtil.obj2String(response.getData()), Consts.RedisCartCacheExTime.REDIS_SESSION_EX_TIME);
         }
         return response;
     }
@@ -164,7 +157,7 @@ public class userController {
         if(StringUtils.isEmpty(loginToken)){
             return serverResponse.createByErrorMessage("You need to login");
         }
-        String userJsonStr = RedisShardedPoolUntil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User currentUser = jsonUtil.string2Obj(userJsonStr,User.class);
         if(currentUser==null){
             return serverResponse.createByErrorCodeMessage(responseCode.NEED_LOGIN.getCode(),"You need to login in，code=10");

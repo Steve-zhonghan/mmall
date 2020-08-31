@@ -1,5 +1,6 @@
 package com.mmall.dao;
 
+import com.mmall.pojo.Order;
 import com.mmall.pojo.Shipping;
 import org.apache.ibatis.annotations.Param;
 
