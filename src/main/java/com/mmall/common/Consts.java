@@ -139,4 +139,7 @@ public class Consts {
             }throw new RuntimeException("Failed to find related enum");
         }
     }
+    public interface REDIS_LOCK{
+        String CLOSE_ORDER_TASK_LOCK = "CLOSE_ORDER_TASK_LOCK";
+    }
 }

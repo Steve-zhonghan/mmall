@@ -544,7 +544,6 @@ public class orderServiceImpl implements IOrderService {
 
     @Override
     public void closeOrder(int hour){
-
         Date closeDateTime  = DateUtils.addHours(new Date(),-hour);
         List<Order> orderList = orderMapper.selectOrderStatusByCreateTime(Consts.OrderStatusEnum.NO_PAY.getCode(),DateTimeUtil.dateToStr(closeDateTime));
         for(Order order:orderList){
