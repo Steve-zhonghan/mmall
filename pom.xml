@@ -245,7 +245,7 @@
       <artifactId>redisson</artifactId>
       <version>2.9.0</version>
     </dependency>
-    <!--com.fasterxml.jackson.dataformat.avro.PackageVersion-->
+    <!--com.fasterxml.jackson.dataformat.avro.PackageVersion，redisson所依赖的jar包-->
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-avro</artifactId>
